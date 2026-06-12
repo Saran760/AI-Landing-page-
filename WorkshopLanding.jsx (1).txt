@@ -1,0 +1,589 @@
+import React, { useState } from "react";
+
+const ACCENT = "#FF6B5B"; // coral
+const CYAN = "#3DDC97";   // mint/cyan-green for "tech" highlights
+const INK = "#161A2E";    // deep indigo/near-black
+const PAPER = "#F7F6F2";
+
+const outcomes = [
+  "Build and program a working robot car using sensors and motors",
+  "Write your first lines of Python code to control hardware",
+  "Understand how AI models 'see' and recognize images",
+  "Design and test a simple machine-learning game",
+  "Create a mini smart-home automation project",
+  "Present your final robot demo to friends and family in a live showcase",
+];
+
+const faqs = [
+  {
+    q: "Do I need any prior coding experience?",
+    a: "No prior experience is required. The workshop starts from the basics and builds up step by step, with live mentor support throughout.",
+  },
+  {
+    q: "What equipment will my child need?",
+    a: "A laptop or desktop with internet access is enough to start. A starter robotics kit (ordered separately or provided in the welcome pack) is used from Week 2 onward — full details are shared after enrollment.",
+  },
+  {
+    q: "Will there be a certificate after completion?",
+    a: "Yes. Every child who completes the 4-week program and final showcase receives a Kidrove AI & Robotics certificate of completion.",
+  },
+  {
+    q: "What if my child misses a live session?",
+    a: "All sessions are recorded and shared within 24 hours, so your child can catch up at their own pace without falling behind.",
+  },
+];
+
+function Header() {
+  return (
+    <header className="kr-header">
+      <div className="kr-header-inner">
+        <span className="kr-logo">
+          kidrove<span style={{ color: ACCENT }}>.</span>
+        </span>
+        <nav className="kr-nav">
+          <a href="#details">Details</a>
+          <a href="#outcomes">What you'll build</a>
+          <a href="#faq">FAQ</a>
+          <a href="#register" className="kr-nav-cta">
+            Enroll
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="kr-hero">
+      <div className="kr-hero-orbit" aria-hidden="true">
+        <div className="kr-orbit-ring kr-ring-1" />
+        <div className="kr-orbit-ring kr-ring-2" />
+        <div className="kr-orbit-dot kr-dot-a" />
+        <div className="kr-orbit-dot kr-dot-b" />
+        <div className="kr-orbit-dot kr-dot-c" />
+      </div>
+      <div className="kr-hero-content">
+        <p className="kr-eyebrow">SUMMER 2026 · ONLINE PROGRAM</p>
+        <h1 className="kr-hero-title">
+          AI &amp; Robotics
+          <br />
+          Summer Workshop
+        </h1>
+        <p className="kr-hero-desc">
+          A 4-week hands-on online journey where kids aged 8–14 build real
+          robots, write real code, and meet their first AI models —
+          one playful project at a time.
+        </p>
+        <a href="#register" className="kr-btn-primary">
+          Enroll Now
+        </a>
+        <div className="kr-hero-meta">
+          <span>👾 Ages 8–14</span>
+          <span>🗓 Starts 15 July 2026</span>
+          <span>💻 Fully Online</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DetailsSection() {
+  const details = [
+    { label: "Age Group", value: "8 – 14 Years", icon: "🧑‍🚀" },
+    { label: "Duration", value: "4 Weeks", icon: "⏳" },
+    { label: "Mode", value: "Online (Live)", icon: "💻" },
+    { label: "Fee", value: "₹2,999", icon: "🏷" },
+    { label: "Start Date", value: "15 July 2026", icon: "🚀" },
+  ];
+  return (
+    <section id="details" className="kr-section">
+      <h2 className="kr-section-title">Workshop Details</h2>
+      <div className="kr-details-grid">
+        {details.map((d) => (
+          <div className="kr-detail-card" key={d.label}>
+            <span className="kr-detail-icon">{d.icon}</span>
+            <span className="kr-detail-label">{d.label}</span>
+            <span className="kr-detail-value">{d.value}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function OutcomesSection() {
+  return (
+    <section id="outcomes" className="kr-section kr-section-alt">
+      <h2 className="kr-section-title">What You'll Build &amp; Learn</h2>
+      <p className="kr-section-sub">
+        Six hands-on milestones, one for every stage of your AI &amp; robotics
+        journey.
+      </p>
+      <ul className="kr-outcomes-list">
+        {outcomes.map((o, i) => (
+          <li className="kr-outcome-item" key={i}>
+            <span className="kr-outcome-num">{String(i + 1).padStart(2, "0")}</span>
+            <span className="kr-outcome-text">{o}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function FAQItem({ faq, isOpen, onToggle }) {
+  return (
+    <div className={`kr-faq-item ${isOpen ? "kr-faq-open" : ""}`}>
+      <button className="kr-faq-question" onClick={onToggle}>
+        <span>{faq.q}</span>
+        <span className="kr-faq-icon">{isOpen ? "−" : "+"}</span>
+      </button>
+      {isOpen && <p className="kr-faq-answer">{faq.a}</p>}
+    </div>
+  );
+}
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState(0);
+  return (
+    <section id="faq" className="kr-section">
+      <h2 className="kr-section-title">Frequently Asked Questions</h2>
+      <div className="kr-faq-list">
+        {faqs.map((faq, i) => (
+          <FAQItem
+            key={i}
+            faq={faq}
+            isOpen={openIndex === i}
+            onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RegistrationForm() {
+  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [status, setStatus] = useState("idle"); // idle | submitting | success | error
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("submitting");
+    try {
+      // Calls the Express backend: POST /api/enquiry
+      const res = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          workshop: "AI & Robotics Summer Workshop",
+        }),
+      });
+      if (!res.ok) throw new Error("Request failed");
+      setStatus("success");
+      setForm({ name: "", email: "", phone: "" });
+    } catch (err) {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <section id="register" className="kr-section kr-section-alt">
+      <h2 className="kr-section-title">Register Your Spot</h2>
+      <p className="kr-section-sub">
+        Fill in your details and our team will reach out with the next steps.
+      </p>
+      <form className="kr-form" onSubmit={handleSubmit}>
+        <label className="kr-field">
+          <span>Name</span>
+          <input
+            type="text"
+            name="name"
+            required
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Child's full name"
+          />
+        </label>
+        <label className="kr-field">
+          <span>Email</span>
+          <input
+            type="email"
+            name="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            placeholder="parent@example.com"
+          />
+        </label>
+        <label className="kr-field">
+          <span>Phone Number</span>
+          <input
+            type="tel"
+            name="phone"
+            required
+            value={form.phone}
+            onChange={handleChange}
+            placeholder="+91 98765 43210"
+          />
+        </label>
+        <button type="submit" className="kr-btn-primary kr-btn-full" disabled={status === "submitting"}>
+          {status === "submitting" ? "Submitting..." : "Submit Enquiry"}
+        </button>
+        {status === "success" && (
+          <p className="kr-form-msg kr-form-success">
+            Thanks! We've received your details and will be in touch soon.
+          </p>
+        )}
+        {status === "error" && (
+          <p className="kr-form-msg kr-form-error">
+            Something went wrong — please try again in a moment.
+          </p>
+        )}
+      </form>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="kr-footer">
+      <p>© 2026 Kidrove · AI &amp; Robotics Summer Workshop</p>
+    </footer>
+  );
+}
+
+export default function WorkshopLanding() {
+  return (
+    <div className="kr-page">
+      <style>{`
+        :root {
+          --ink: ${INK};
+          --paper: ${PAPER};
+          --accent: ${ACCENT};
+          --cyan: ${CYAN};
+        }
+        * { box-sizing: border-box; }
+        .kr-page {
+          font-family: 'Trebuchet MS', 'Verdana', sans-serif;
+          background: var(--paper);
+          color: var(--ink);
+          min-height: 100vh;
+          line-height: 1.5;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* Header */
+        .kr-header {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: var(--paper);
+          border-bottom: 3px solid var(--ink);
+        }
+        .kr-header-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .kr-logo {
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+        .kr-nav {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          font-size: 15px;
+          font-weight: 600;
+        }
+        .kr-nav a:hover { color: var(--accent); }
+        .kr-nav-cta {
+          background: var(--ink);
+          color: var(--paper) !important;
+          padding: 8px 18px;
+          border-radius: 999px;
+          transition: background 0.15s ease;
+        }
+        .kr-nav-cta:hover { background: var(--accent); color: var(--ink) !important; }
+
+        /* Hero */
+        .kr-hero {
+          position: relative;
+          overflow: hidden;
+          padding: 80px 24px 100px;
+          background: var(--ink);
+          color: var(--paper);
+        }
+        .kr-hero-content {
+          max-width: 720px;
+          margin: 0 auto;
+          text-align: center;
+          position: relative;
+          z-index: 2;
+        }
+        .kr-eyebrow {
+          font-family: 'Courier New', monospace;
+          letter-spacing: 3px;
+          font-size: 13px;
+          color: var(--cyan);
+          margin: 0 0 16px;
+          font-weight: 700;
+        }
+        .kr-hero-title {
+          font-size: clamp(40px, 8vw, 72px);
+          font-weight: 800;
+          line-height: 1.05;
+          margin: 0 0 20px;
+          letter-spacing: -1px;
+        }
+        .kr-hero-desc {
+          font-size: 18px;
+          color: #c7cbe8;
+          max-width: 540px;
+          margin: 0 auto 32px;
+        }
+        .kr-btn-primary {
+          display: inline-block;
+          background: var(--accent);
+          color: var(--ink);
+          font-weight: 800;
+          font-size: 17px;
+          padding: 16px 40px;
+          border-radius: 999px;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+          box-shadow: 0 6px 0 0 rgba(0,0,0,0.25);
+        }
+        .kr-btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 0 0 rgba(0,0,0,0.25);
+        }
+        .kr-btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 0 rgba(0,0,0,0.25); }
+        .kr-btn-full { width: 100%; }
+        .kr-hero-meta {
+          margin-top: 40px;
+          display: flex;
+          justify-content: center;
+          gap: 28px;
+          flex-wrap: wrap;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--cyan);
+        }
+
+        /* Orbit decoration */
+        .kr-hero-orbit {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 600px;
+          height: 600px;
+          transform: translate(-50%, -50%);
+          z-index: 1;
+        }
+        .kr-orbit-ring {
+          position: absolute;
+          top: 50%; left: 50%;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+        }
+        .kr-ring-1 { width: 420px; height: 420px; }
+        .kr-ring-2 { width: 600px; height: 600px; border-color: rgba(61,220,151,0.10); }
+        .kr-orbit-dot {
+          position: absolute;
+          width: 14px; height: 14px;
+          border-radius: 50%;
+          top: 50%; left: 50%;
+        }
+        .kr-dot-a { background: var(--cyan); transform: translate(190px, -210px); }
+        .kr-dot-b { background: var(--accent); transform: translate(-260px, 120px); }
+        .kr-dot-c { background: var(--cyan); opacity: 0.5; transform: translate(40px, 280px); }
+
+        /* Sections */
+        .kr-section {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 72px 24px;
+        }
+        .kr-section-alt {
+          background: #EFEDE6;
+        }
+        .kr-section-alt > * { max-width: 1000px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px; }
+        .kr-section-alt { max-width: none; padding-left: 0; padding-right: 0; }
+        .kr-section-title {
+          font-size: clamp(28px, 5vw, 40px);
+          font-weight: 800;
+          margin: 0 0 8px;
+          letter-spacing: -0.5px;
+        }
+        .kr-section-sub {
+          color: #5a5e74;
+          font-size: 16px;
+          margin: 0 0 36px;
+          max-width: 600px;
+        }
+
+        /* Details grid */
+        .kr-details-grid {
+          margin-top: 32px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 16px;
+        }
+        .kr-detail-card {
+          background: var(--ink);
+          color: var(--paper);
+          border-radius: 16px;
+          padding: 24px 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          position: relative;
+          overflow: hidden;
+        }
+        .kr-detail-card:nth-child(4) { background: var(--accent); color: var(--ink); }
+        .kr-detail-icon { font-size: 28px; }
+        .kr-detail-label {
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          letter-spacing: 2px;
+          opacity: 0.7;
+          text-transform: uppercase;
+        }
+        .kr-detail-value {
+          font-size: 20px;
+          font-weight: 800;
+        }
+
+        /* Outcomes */
+        .kr-outcomes-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: 14px;
+        }
+        .kr-outcome-item {
+          display: flex;
+          gap: 20px;
+          align-items: flex-start;
+          background: var(--paper);
+          border-radius: 14px;
+          padding: 18px 22px;
+          border: 2px solid var(--ink);
+        }
+        .kr-outcome-num {
+          font-family: 'Courier New', monospace;
+          font-weight: 800;
+          font-size: 18px;
+          color: var(--accent);
+          flex-shrink: 0;
+        }
+        .kr-outcome-text { font-size: 16px; font-weight: 600; }
+
+        /* FAQ */
+        .kr-faq-list { display: grid; gap: 12px; }
+        .kr-faq-item {
+          border: 2px solid var(--ink);
+          border-radius: 14px;
+          overflow: hidden;
+          background: var(--paper);
+        }
+        .kr-faq-question {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          background: none;
+          border: none;
+          text-align: left;
+          font-size: 16px;
+          font-weight: 700;
+          padding: 18px 22px;
+          cursor: pointer;
+          color: var(--ink);
+        }
+        .kr-faq-open .kr-faq-question { background: var(--ink); color: var(--paper); }
+        .kr-faq-icon {
+          font-size: 22px;
+          font-weight: 800;
+          color: var(--cyan);
+          flex-shrink: 0;
+        }
+        .kr-faq-answer {
+          margin: 0;
+          padding: 0 22px 20px;
+          color: #4a4e64;
+          font-size: 15px;
+        }
+
+        /* Form */
+        .kr-form {
+          display: grid;
+          gap: 18px;
+          max-width: 480px;
+        }
+        .kr-field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          font-weight: 700;
+          font-size: 14px;
+        }
+        .kr-field input {
+          font-family: inherit;
+          font-size: 15px;
+          padding: 14px 16px;
+          border-radius: 10px;
+          border: 2px solid var(--ink);
+          background: var(--paper);
+          color: var(--ink);
+        }
+        .kr-field input:focus {
+          outline: 3px solid var(--cyan);
+          outline-offset: 1px;
+        }
+        .kr-form-msg { font-size: 14px; font-weight: 600; margin: 0; }
+        .kr-form-success { color: #1a7a4c; }
+        .kr-form-error { color: var(--accent); }
+
+        /* Footer */
+        .kr-footer {
+          text-align: center;
+          padding: 32px 24px;
+          font-size: 13px;
+          color: #8b8f9f;
+          border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 640px) {
+          .kr-nav { gap: 14px; font-size: 13px; }
+          .kr-nav a:not(.kr-nav-cta) { display: none; }
+          .kr-hero { padding: 56px 20px 72px; }
+          .kr-section { padding: 56px 20px; }
+        }
+      `}</style>
+
+      <Header />
+      <Hero />
+      <DetailsSection />
+      <OutcomesSection />
+      <FAQSection />
+      <RegistrationForm />
+      <Footer />
+    </div>
+  );
+}
